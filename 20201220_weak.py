@@ -23,9 +23,17 @@ def getAction(board, moves):
         [0, 1],
         [1, 1]
     ]
+    danger = [
+        [0, 0],
+        [0, 7],
+        [7, 0],
+        [7, 7]
+    ]
     max_index = moves[0]
     max_available = 0
     for move in moves:
+        if move in danger:
+            continue
         available = 0
         for dir in dirs:
             moved_index = [move[0] + dir[0], move[1] + dir[1]]
