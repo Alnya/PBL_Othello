@@ -23,6 +23,9 @@ def getAction(board, moves):
     print("--------------------------------------------------")
     print(f"turn: {turn}")
 
+    if 46 <= turn <= 47:
+        if len(moves) < 3:
+            return complete_main(board, moves, turn, start_time)
     if turn == 2:
         t2 = turn2(board)
         if t2 is not None and t2 in moves:
@@ -34,27 +37,24 @@ def getAction(board, moves):
             print(f"兎定石だ!\\('o')/")
             return t3
     if turn < 15:
-        move, rate = open_rate(board, moves)
-        if type(rate) == str:
-            print(f"turn: {turn}\n{rate}")
-        else:
-            print(f"turn: {turn}\nopen_rate: {rate} points")
-        print(f"time: {time.time() - start_time:.2f} sec.")
-        print(f"move: {move}")
-        return move
+        return open_rate_main(board, moves, turn, start_time)
     elif turn < 48:
         return middle_main(board, moves, turn, start_time)
     else:
-        move, rate, ave_rate = complete(board, moves, turn, 1)
-        if rate == 0:
-            print(f"theory_rate: 0.00 %\nSo, I changed the algorithm.")
-            return middle_main(board, moves, turn, start_time)
-        else:
-            print(f"turn: {turn}\ntheory_rate: {rate * 100:.2f} %\nave_rate: {ave_rate * 100:.2f} %")
-            print(f"time: {time.time() - start_time:.2f} sec.")
-            print(f"move: {move}")
-            print(f"len(moves): {len(moves)}")
-            return move
+        return complete_main(board, moves, turn, start_time)
+
+
+def complete_main(board, moves, turn, start_time):
+    move, rate, ave_rate = complete(board, moves, turn, 1)
+    if rate == 0:
+        print(f"theory_rate: 0.00 %\nSo, I changed the algorithm.")
+        return middle_main(board, moves, turn, start_time)
+    else:
+        print(f"turn: {turn}\ntheory_rate: {rate * 100:.2f} %\nave_rate: {ave_rate * 100:.2f} %")
+        print(f"time: {time.time() - start_time:.2f} sec.")
+        print(f"move: {move}")
+        print(f"len(moves): {len(moves)}")
+        return move
 
 
 def middle_main(board, moves, turn, start_time):
@@ -68,6 +68,17 @@ def middle_main(board, moves, turn, start_time):
     print(f"time: {time.time() - start_time:.2f} sec.")
     print(f"move: {move}")
     print(f"len(moves): {len(moves)}")
+    return move
+
+
+def open_rate_main(board, moves, turn, start_time):
+    move, rate = open_rate(board, moves)
+    if type(rate) == str:
+        print(f"turn: {turn}\n{rate}")
+    else:
+        print(f"turn: {turn}\nopen_rate: {rate} points")
+    print(f"time: {time.time() - start_time:.2f} sec.")
+    print(f"move: {move}")
     return move
 
 
