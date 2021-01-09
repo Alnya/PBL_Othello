@@ -45,12 +45,12 @@ def getAction(board, moves):
 
 
 def complete_main(board, moves, turn, start_time):
-    move, rate, ave_rate = complete(board, moves, turn, 1)
+    move, rate = complete(board, moves, turn, 1)
     if rate == 0:
         print(f"theory_rate: 0.00 %\nSo, I changed the algorithm.")
         return middle_main(board, moves, turn, start_time)
     else:
-        print(f"turn: {turn}\ntheory_rate: {rate * 100:.2f} %\nave_rate: {ave_rate * 100:.2f} %")
+        print(f"turn: {turn}\ntheory_rate: {rate * 100:.2f} %")
         print(f"time: {time.time() - start_time:.2f} sec.")
         print(f"move: {move}")
         print(f"len(moves): {len(moves)}")
@@ -89,20 +89,17 @@ def complete(board, moves, turn, player):
         moves = Ol.getMoves(board, player, 8)
     if len(moves) == 0:
         rate = win_rate(board)
-        return None, rate, rate
+        return None, rate
 
     ans_move = moves[0]
 
     if turn == 60:
         next_board = Ol.execute(tmp_board, ans_move, player, 8)
         rate = win_rate(next_board)
-        return ans_move, rate, rate
+        return ans_move, rate
 
     w_rate = 0
     l_rate = 1
-    sum_rate = 0
-    ave_move = moves[0]
-    ave_rate_max = 0
     for move in moves:
         # tmp_board = copy.deepcopy(board)
         # copy.deepcopyよりforで回した方が早い?
@@ -111,32 +108,24 @@ def complete(board, moves, turn, player):
                 tmp_board[h][w] = board[h][w]
         next_board = Ol.execute(tmp_board, move, player, 8)
         next_moves = Ol.getMoves(next_board, player * -1, 8)
-        next_move, next_rate, next_ave_rate = complete(next_board, next_moves, turn + 1, player * -1)
+        next_move, next_rate = complete(next_board, next_moves, turn + 1, player * -1)
 
         # 2021/01/09追加
         if player == 1 and next_rate == 1:
-            return move, next_rate, next_ave_rate
+            return move, next_rate
         elif player == -1 and next_rate == 0:
-            return None, next_rate, next_ave_rate
+            return None, next_rate
 
         if w_rate < next_rate:
             w_rate = next_rate
             ans_move = move
         if l_rate > next_rate:
             l_rate = next_rate
-        if ave_rate_max < next_ave_rate:
-            ave_move = move
-            ave_rate_max = next_ave_rate
-        sum_rate += next_ave_rate
-    ave_rate = float(sum_rate / len(moves))
 
     if player == 1:
-        if w_rate == 0:
-            return ave_move, w_rate, ave_rate
-        else:
-            return ans_move, w_rate, ave_rate
+        return ans_move, w_rate
     else:
-        return None, l_rate, ave_rate
+        return None, l_rate
 
 
 def win_rate(board):
